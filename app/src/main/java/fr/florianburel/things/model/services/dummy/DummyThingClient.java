@@ -1,5 +1,6 @@
 package fr.florianburel.things.model.services.dummy;
 
+import fr.florianburel.things.model.modelObject.Order;
 import fr.florianburel.things.model.modelObject.Product;
 import fr.florianburel.things.model.services.IThingsClient;
 
@@ -29,6 +30,11 @@ public class DummyThingClient implements IThingsClient {
 
             products.add(p);
         }
+
+    }
+
+    @Override
+    public void PlaceOrderAsync(Order order) {
 
     }
 

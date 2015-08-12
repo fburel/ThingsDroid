@@ -2,8 +2,14 @@ package fr.florianburel.things.droid.Fragment;
 
 
 import android.app.Activity;
+import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +20,7 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 
+import fr.florianburel.things.droid.WebService.MyHTTPD;
 import fr.florianburel.things.model.modelObject.Product;
 import fr.florianburel.things.model.services.IThingsClient;
 import fr.florianburel.things.model.services.ServiceLocator;
@@ -24,8 +31,10 @@ import fr.florianburel.things.droid.ListAdapter.ProductAdapter;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class ProductListFragment extends Fragment implements AdapterView.OnItemClickListener {
+public class ProductListFragment extends android.support.v4.app.Fragment implements AdapterView.OnItemClickListener {
 
+
+    private BroadcastReceiver broadcastReceiver;
 
     public ProductListFragment() {
         // Required empty public constructor
@@ -56,21 +65,46 @@ public class ProductListFragment extends Fragment implements AdapterView.OnItemC
         }
         else
         {
-            ServiceLocator.getInstance().getThingClient().FetchAllProducts(new IThingsClient.OnFetchResultsListener() {
-                @Override
-                public void OnResult(ArrayList<Product> results, Exception error) {
+            updateDataSource();
 
-                    products = results;
-
-                    adapter = new ProductAdapter(getActivity(), products);
-
-                    listView.setAdapter(adapter);
-
-                }
-            });
         }
 
+        this.broadcastReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                updateDataSource();
+            }
+        };
+
+        getActivity().registerReceiver(this.broadcastReceiver, new IntentFilter(MyHTTPD.UPDATE_AVAILABLE));
+
         return v;
+    }
+
+    private void updateDataSource() {
+
+        final ProgressDialog spinner = new ProgressDialog(getActivity());
+
+        spinner.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+
+        spinner.setMessage("Downloading...");
+
+        spinner.show();
+
+        ServiceLocator.getInstance().getThingClient().FetchAllProducts(new IThingsClient.OnFetchResultsListener() {
+            @Override
+            public void OnResult(ArrayList<Product> results, Exception error) {
+
+                spinner.dismiss();
+
+                products = results;
+
+                adapter = new ProductAdapter(getActivity(), products);
+
+                listView.setAdapter(adapter);
+
+            }
+        });
     }
 
     public static ProductListFragment NewInstance() {

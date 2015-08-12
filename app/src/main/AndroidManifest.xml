@@ -6,6 +6,7 @@
 
     <!-- Permissions -->
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
 
     <application
         android:allowBackup="true"
@@ -13,7 +14,7 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name="fr.florianburel.things.droid.Activity.LoginActivity"
+            android:name=".Activity.LoginActivity"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -22,9 +23,18 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="fr.florianburel.things.droid.Activity.MainActivity"
+            android:name=".Activity.MainActivity"
             android:label="@string/title_activity_thing" >
         </activity>
+        <activity
+            android:name=".Activity.DetailActivity"
+            android:label="@string/title_activity_detail"
+            android:parentActivityName=".Activity.MainActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="fr.florianburel.things.droid.Activity.MainActivity" />
+        </activity>
+
     </application>
 
 </manifest>

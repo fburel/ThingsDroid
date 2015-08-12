@@ -3,6 +3,8 @@ package fr.florianburel.things.model.services.dummy;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import fr.florianburel.things.model.modelObject.Order;
 import fr.florianburel.things.model.modelObject.Product;
 import fr.florianburel.things.model.services.IThingsClient;
 
@@ -34,6 +36,11 @@ public class ParseThingClient implements IThingsClient
 
 
     private ArrayList<Product> products = new ArrayList<Product>();
+
+    @Override
+    public void PlaceOrderAsync(Order order) {
+
+    }
 
     @Override
     public void FetchAllProducts(OnFetchResultsListener listener) {

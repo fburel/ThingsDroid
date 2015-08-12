@@ -8,12 +8,14 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import fr.florianburel.things.model.modelObject.Order;
 import fr.florianburel.things.model.modelObject.Product;
 import fr.florianburel.things.model.services.IThingsClient;
 
@@ -40,6 +42,67 @@ public class VolleyParseClient implements IThingsClient {
 
 
     private ArrayList<Product> products;
+
+    @Override
+    public void PlaceOrderAsync(Order order) {
+
+        DownloadQueue.start();
+
+        String url = BASE_URL + "/1/classes/order";
+
+        JSONObject messageBody = new JSONObject();
+        try {
+
+            messageBody.put("user", order.getIp());
+
+            JSONArray array = new JSONArray();
+
+            for(Product key : order.getContent().keySet())
+            {
+                int qte = order.getContent().get(key);
+
+                for(int i = 0 ; i < qte ; i++)
+                {
+                    array.put(key.getRef());
+                }
+            }
+
+            messageBody.put("productRef", array);
+
+
+        } catch (JSONException e) {
+
+
+        }
+
+
+        Response.Listener<JSONObject> successListener = new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+
+            }
+        };
+
+        Response.ErrorListener errorListener = new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+            }
+        };
+
+        Request request = new ParseRequest(
+                Request.Method.POST,
+                url,
+                messageBody,
+                successListener,
+                errorListener
+        );
+
+
+        DownloadQueue.add(request);
+
+
+    }
 
     @Override
     public void FetchAllProducts(final OnFetchResultsListener listener) {
@@ -79,6 +142,8 @@ public class VolleyParseClient implements IThingsClient {
 
                         productArrayList.add(p);
                     }
+
+                    products = new ArrayList<>(productArrayList);
 
                     listener.OnResult(productArrayList, null);
                 }
@@ -142,6 +207,7 @@ public class VolleyParseClient implements IThingsClient {
 
             params.put("X-Parse-Application-Id", APPLICATION_ID);
             params.put("X-Parse-REST-API-Key", REST_API_KEY);
+            params.put("Content-Type", "application/json");
 
             return params;
         }

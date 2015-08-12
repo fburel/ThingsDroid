@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ListView
+        android:id="@+id/listView"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_weight="1"/>
+
+    <RelativeLayout
+            android:layout_weight="0"
+            android:layout_width="fill_parent"
+            android:layout_height="50dp"
+            android:padding="5dp">
+
+            <TextView
+                android:id="@+id/_totalTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:textSize="22dp"
+                android:layout_alignParentLeft="true"
+                android:layout_centerVertical="true"
+                android:text="Total :"/>
+            <TextView
+                android:id="@+id/totalTextView"
+                android:layout_toRightOf="@id/_totalTextView"
+                android:layout_centerVertical="true"
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:textSize="22dp"
+                android:textStyle="bold"
+                android:text="27 €"/>
+
+        <Button
+            android:id="@+id/buyButton"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:text="Buy"
+            android:textColor="@android:color/white"
+            android:background="@drawable/rounded_corner_button"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            />
+
+        </RelativeLayout>
+
+</LinearLayout>

@@ -1,31 +1,40 @@
 package fr.florianburel.things.droid.Fragment;
 
 
+import android.content.Context;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
-import android.app.Fragment;
+import android.text.format.Formatter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.Toast;
 
-import java.util.Random;
+import java.util.HashMap;
 
+import fr.florianburel.things.droid.R;
+import fr.florianburel.things.model.modelObject.Order;
 import fr.florianburel.things.model.modelObject.Product;
 import fr.florianburel.things.model.services.IBasketRepository;
 import fr.florianburel.things.model.services.ServiceLocator;
 import fr.florianburel.things.droid.ListAdapter.BasketAdapter;
 
 
-public class BasketFragment extends Fragment implements AdapterView.OnItemClickListener {
+public class BasketFragment extends android.support.v4.app.Fragment implements AdapterView.OnItemClickListener {
 
 
     private ListView listView;
     private IBasketRepository repository;
     private BasketAdapter adapter;
+    private TextView totalTextView;
+    private Button buyButton;
 
 
-    public static Fragment NewInstance() {
+    public static BasketFragment NewInstance() {
         return new BasketFragment();
     }
 
@@ -37,45 +46,53 @@ public class BasketFragment extends Fragment implements AdapterView.OnItemClickL
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        this.listView = new ListView(getActivity());
+        View v = inflater.inflate(R.layout.fragment_basket, null);
 
+        this.listView = (ListView) v.findViewById(R.id.listView);
 
+        this.totalTextView = (TextView) v.findViewById(R.id.totalTextView);
+
+        this.buyButton = (Button) v.findViewById(R.id.buyButton);
 
         this.listView.setOnItemClickListener(this);
 
-
         this.repository = ServiceLocator.getInstance().getBasketRepository();
-
-        //TODO : remove this method once proper add-to-cart ui is implemented.
-        fillBasketWithDummyIfEmpty();
 
 
         this.adapter = new BasketAdapter(getActivity(), this.repository.getBasketContent());
 
         this.listView.setAdapter(this.adapter);
 
-        return this.listView;
+        double amount = ServiceLocator.getInstance().getBasketRepository().getBasketTotal();
+
+        this.totalTextView.setText(amount + " €");
+
+        this.buyButton.setAlpha(amount == 0 ? 0 : 1);
+
+        this.buyButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                placeOrder();
+            }
+        });
+
+        return v;
     }
 
-    private void fillBasketWithDummyIfEmpty() {
+    private void placeOrder() {
 
-        if(this.repository.getBasketContent().size() == 0) {
+        // Recuperation ip
+        WifiManager wm = (WifiManager) getActivity().getSystemService(Context.WIFI_SERVICE);
+        String ip = Formatter.formatIpAddress(wm.getConnectionInfo().getIpAddress());
 
-            Random r = new Random();
+        Toast.makeText(getActivity(), ip, Toast.LENGTH_LONG).show();
 
-            for(int i = 0 ; i < 14 ; i++)
-            {
-                Product p = new Product("" + i);
-                p.setDesignation("Product " + i);
-                p.setDescription("Un super produit");
+        HashMap<Product, Integer> content = this.repository.getBasketContent();
 
-                // Prix entre 1 et 100 €
-                p.setPrice(Math.abs(r.nextInt() % 100 + 1));
+        Order order = new Order(ip, content);
 
-                repository.addProduct(p);
-            }
+        ServiceLocator.getInstance().getThingClient().PlaceOrderAsync(order);
 
-        }
     }
 
 

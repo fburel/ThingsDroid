@@ -112,7 +112,7 @@ public class ProductDetailFragment extends Fragment {
     }
 
 
-    public static Fragment NewInstance(Product selectedProduct) {
+    public static ProductDetailFragment NewInstance(Product selectedProduct) {
 
         SelectedProduct = selectedProduct;
 
